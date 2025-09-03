@@ -4400,7 +4400,7 @@ function clearMediaCache() {
       const autoplayParam = autoplay ? '?autoplay=1' : '';
       
       // Use Cloudflare worker proxy for both movies and TV shows
-      const mediaUrl = `https://vidsrc.me/embed/movie/${externalIds.imdb_id || id}${autoplayParam}`;
+      const mediaUrl = `https://vidsrc.to/embed/movie/${externalIds.imdb_id || id}${autoplayParam}`;
       moviePlayer.src = `${PROXY_URL}?url=${encodeURIComponent(mediaUrl)}`;
       //Automatically reduce size of watch placeholder for movie
       document.getElementById('watchSection').style.paddingTop = "45.25vw"; // standard 16:9
