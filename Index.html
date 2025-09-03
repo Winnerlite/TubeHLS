@@ -1,0 +1,225 @@
+async function playMovie(id, type) {
+  console.log(`Playing ${type}: ID ${id}`);
+  try {
+    watchPlaceholder.style.display = 'block';
+    watchPlaceholder.innerHTML = `
+      <div class="error-message">
+        <i class="fas fa-spinner fa-spin" style="font-size: 2.5rem; color: var(--primary);"></i>
+        <h2>Loading...</h2>
+        <p>Fetching details, please wait.</p>
+      </div>
+    `;
+    document.getElementById('movieInfoSection').style.display = 'none';
+    document.getElementById('tvSelector').style.display = 'none';
+    document.getElementById('tvControls').style.display = 'none'; // Hide controls initially
+
+    const [detailsRes, externalIdsRes] = await Promise.all([
+      fetch(`${BASE_URL}/${type}/${id}?api_key=${API_KEY}`),
+      type === 'movie' ? fetch(`${BASE_URL}/${type}/${id}/external_ids?api_key=${API_KEY}`) : Promise.resolve({})
+    ]);
+    
+    if (!detailsRes.ok || (type === 'movie' && !externalIdsRes.ok)) {
+      console.error(`${type} details failed: Status ${detailsRes.status}`);
+      throw new Error(`Failed to fetch ${type} data for ID ${id}`);
+    }
+    
+    const media = await detailsRes.json();
+    const externalIds = type === 'movie' ? await externalIdsRes.json() : {};
+    
+    // Store the full show details in currentMovie
+    currentMovie = {
+      ...media,
+      imdb_id: externalIds.imdb_id || id,
+      type: type
+    };
+
+    if (type === 'tv') {
+      console.log(`TV show detected, fetching seasons for ID: ${id}`);
+      
+      if (!media.seasons || media.seasons.length === 0) {
+        console.error(`No seasons available for TV show ID ${id}`);
+        throw new Error(`No seasons available for TV show ID ${id}`);
+      }
+
+      // Set up the persistent TV controls
+      const tvControls = document.getElementById('tvControls');
+      const seasonControlSelect = document.getElementById('seasonControlSelect');
+      const episodeControlSelect = document.getElementById('episodeControlSelect');
+      
+      // Clear and populate season dropdown
+      seasonControlSelect.innerHTML = '<option value="">Choose Season</option>';
+      media.seasons.forEach(season => {
+        if (season.season_number >= 0) {
+          const option = document.createElement('option');
+          option.value = season.season_number;
+          option.textContent = `Season ${season.season_number || 'Specials'}`;
+          seasonControlSelect.appendChild(option);
+        }
+      });
+
+      // Show the controls
+      tvControls.style.display = 'block';
+      
+      // Set current season to first available (if exists)
+      const firstValidSeason = media.seasons.find(s => s.season_number > 0);
+      if (firstValidSeason) {
+        seasonControlSelect.value = firstValidSeason.season_number;
+        await populateControlEpisodes(id, firstValidSeason.season_number);
+        
+        // Set first episode as default
+        const episodeRes = await fetch(`${BASE_URL}/tv/${id}/season/${firstValidSeason.season_number}?api_key=${API_KEY}`);
+        const seasonData = await episodeRes.json();
+        if (seasonData.episodes?.length > 0) {
+          episodeControlSelect.value = seasonData.episodes[0].episode_number;
+          // Play the first episode by default using proxy
+          playFromControls(id, seasonControlSelect.value, episodeControlSelect.value);
+        }
+      }
+
+      watchPlaceholder.style.display = 'none';
+      console.log(`Showing TV controls for ID: ${id}`);
+      
+      return;
+    } else {
+      // Movie playback - Using Cloudflare worker proxy
+      console.log(`Setting movie player src for ID ${id}, using proxy`);
+      const autoplay = localStorage.getItem('autoplay') === 'true';
+      const autoplayParam = autoplay ? '?autoplay=1' : '';
+      
+      // Use Cloudflare worker proxy for both movies and TV shows
+      const mediaUrl = `https://vidsrc.to/embed/movie/${externalIds.imdb_id || id}${autoplayParam}`;
+      moviePlayer.src = `${PROXY_URL}?url=${encodeURIComponent(mediaUrl)}`;
+      
+      // Show autoplay toast if enabled
+      const toast = document.getElementById('autoplayToast');
+      if (autoplay && toast) {
+        toast.classList.remove('hidden');
+        toast.classList.add('show');
+        setTimeout(() => {
+          toast.classList.remove('show');
+          toast.classList.add('hidden');
+        }, 6000);
+      }
+      
+      moviePlayer.style.display = 'block';
+      watchPlaceholder.style.display = 'none';
+      document.getElementById('tvControls').style.display = 'none';
+
+      // Fetch additional movie details
+      const [detailsRes, creditsRes, reviewsRes, recommendationsRes] = await Promise.all([
+        fetch(`${BASE_URL}/${type}/${id}?api_key=${API_KEY}`),
+        fetch(`${BASE_URL}/${type}/${id}/credits?api_key=${API_KEY}`),
+        fetch(`${BASE_URL}/${type}/${id}/reviews?api_key=${API_KEY}`),
+        fetch(`${BASE_URL}/${type}/${id}/recommendations?api_key=${API_KEY}`)
+      ]).catch(err => {
+        console.error(`Network error fetching movie data: ${err.message}`);
+        throw new Error(`Network error fetching movie data for ID ${id}`);
+      });
+
+      if (!detailsRes.ok || !creditsRes.ok || !reviewsRes.ok || !recommendationsRes.ok) {
+        console.error(`Details request failed: Status ${detailsRes.status}`);
+        console.error(`Credits request failed: Status ${creditsRes.status}`);
+        console.error(`Reviews request failed: Status ${reviewsRes.status}`);
+        console.error(`Recommendations request failed: Status ${recommendationsRes.status}`);
+        throw new Error(`Failed to fetch movie data for ID ${id}`);
+      }
+
+      const media = await detailsRes.json();
+      const credits = await creditsRes.json();
+      const reviews = await reviewsRes.json();
+      const recommendations = await recommendationsRes.json();
+
+      currentMovie = media;
+      movieTitle.textContent = media.title || media.name;
+      movieRating.innerHTML = `<i class="fas fa-star" style="color:#ffd700;"></i> ${media.vote_average ? media.vote_average.toFixed(1) : 'N/A'}/10`;
+      movieYear.textContent = media.release_date ? media.release_date.split('-')[0] : 'N/A';
+      movieRuntime.textContent = media.runtime ? `${Math.floor(media.runtime / 60)}h ${media.runtime % 60}m` : 'N/A';
+      movieGenres.innerHTML = media.genres.map(genre => `<span class="genre">${genre.name}</span>`).join('');
+      movieOverview.textContent = media.overview || 'No overview available.';
+      movieCast.innerHTML = '';
+
+      const dataSaverEnabled = localStorage.getItem('dataSaver') === 'true';
+
+      if (credits.cast && credits.cast.length > 0) {
+        credits.cast.slice(0, 10).forEach(actor => {
+          const card = document.createElement('div');
+          card.className = 'cast-card';
+
+          const imageOrPlaceholder = dataSaverEnabled || !actor.profile_path
+            ? `<div class="placeholder-poster">${actor.name}</div>`
+            : `<img src="${IMG_URL}${actor.profile_path}" alt="${actor.name}" loading="lazy" />`;
+
+          card.innerHTML = `
+            ${imageOrPlaceholder}
+            <div class="cast-name">${actor.name}</div>
+            <div class="cast-character">${actor.character || 'Unknown'}</div>
+          `;
+
+          movieCast.appendChild(card);
+        });
+      }
+      
+      movieReviews.innerHTML = '';
+      if (reviews.results && reviews.results.length > 0) {
+        reviews.results.slice(0, 3).forEach(review => {
+          const card = document.createElement('div');
+          card.className = 'review-card';
+          card.innerHTML = `
+            <div class="review-author">${review.author}</div>
+            ${review.author_details.rating ? 
+              `<div class="review-rating">
+                <i class="fas fa-star"></i> ${review.author_details.rating}/10
+              </div>` : ''
+            }
+            <div class="review-content">${review.content}</div>
+          `;
+          movieReviews.appendChild(card);
+        });
+      } else {
+        movieReviews.innerHTML = '<p>No reviews available for this show.</p>';
+      }
+      
+      relatedMovies.innerHTML = '';
+      if (recommendations.results && recommendations.results.length > 0) {
+        recommendations.results.slice(0, 10).forEach(item => {
+          const card = document.createElement('div');
+          card.className = 'movie-card';
+          card.dataset.id = item.id;
+          card.dataset.type = item.media_type || type;
+          card.innerHTML = `
+            ${item.poster_path ? 
+              `<img src="${IMG_URL}${item.poster_path}" alt="${item.title || item.name}" loading="lazy" />` :
+              `<div class="placeholder-poster"><i class="fas fa-film"></i></div>`
+            }
+            <div class="movie-overlay">
+              <div class="movie-rating">
+                <i class="fas fa-star"></i>
+                ${item.vote_average ? item.vote_average.toFixed(1) : 'N/A'}
+              </div>
+            </div>
+            <button class="play-btn"><i class="fas fa-play"></i></button>
+          `;
+          card.addEventListener('click', () => playMovie(item.id, item.media_type || type));
+          relatedMovies.appendChild(card);
+        });
+      }
+      
+      document.getElementById('movieInfoSection').style.display = 'block';
+      document.getElementById('placeholderContent').style.display = 'none';
+    }
+  } catch (error) {
+    console.error(`Error playing ${type} for ID ${id}:`, error.message);
+    watchPlaceholder.innerHTML = `
+      <div class="error-message">
+        <i class="fas fa-exclamation-triangle"></i>
+        <h2>Oops, Something Went Wrong!</h2>
+        <p>Sorry, we couldn't load ${type === 'tv' ? 'the show' : 'the movie'}. It might not be available.</p>
+        <button class="retry-btn" onclick="switchTab('movies')">Browse Movies</button>
+      </div>
+    `;
+    watchPlaceholder.style.display = 'block';
+    moviePlayer.style.display = 'none';
+    document.getElementById('tvControls').style.display = 'none';
+    document.getElementById('placeholderContent').style.display = 'block';
+  }
+}
