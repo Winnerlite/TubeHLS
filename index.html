@@ -4585,7 +4585,7 @@ async function playFromControls(id, season, episode) {
 
      // Play the episode using TMDB ID directly
     moviePlayer.src = `${PROXY_URL}?url=${encodeURIComponent(
-  `https://vidsrc.me/embed/tv?tmdb=${currentMovie.tmdb_id}&season=${season}&episode=${episode}`
+  `https://vidsrc.to/embed/tv?tmdb=${currentMovie.tmdb_id}&season=${season}&episode=${episode}`
 )}`;
     //Automatically increase the size of watch placeholder for Tv
     document.getElementById('watchSection').style.paddingTop = "80vw"; // taller player
