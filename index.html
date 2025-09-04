@@ -1176,6 +1176,9 @@ nav a:hover i {
   background: var(--dark-bg);
   display: none; /* Hidden by default */
 }
+#placeholderContent {
+  margin-top: 150px;
+}
 
 .placeholder-content.active {
   display: block; /* Shown when active */
@@ -1448,7 +1451,7 @@ nav a:hover i {
   background: rgba(26, 42, 58, 0.95);
   border-radius: 12px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-  z-index: 906;
+  z-index: 1001;
   transform: translateY(110%);
   transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   display: flex;
@@ -2802,66 +2805,52 @@ margin-top: -9px;
   color: white;
 }
 
-/* Video Player Styles */
-/* Premium Video Player Styles with FF4D6D accent */
+
+/* Remove card styling from video player */
 .promo-video-container {
-  padding: 24px;
-  background: linear-gradient(145deg, #1A1A1A, #121212);
-  margin: 20px;
-  border-radius: 16px;
-  border: 1px solid rgba(255, 77, 109, 0.15);
-  box-shadow: 0 12px 28px rgba(255, 77, 109, 0.1);
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  margin: 0 0 20px 0 !important;
 }
 
+
+/* Make video player full width */
 .video-player-wrapper {
-  display: flex;
-  flex-direction: column;
-  gap: 18px;
+  width: 100%;
+  margin: 0;
 }
 
-/* Mute button styles */
-.video-player-wrapper { position: relative; /* why: anchor absolute children (muteBtn) to wrapper */ }
+/* Adjust video player styling */
+.video-player {
+  width: 100%;
+  height: 63vw; /* Increased from 56.25vw for taller aspect ratio */
+  max-height: 70vh; /* Increased maximum height */
+  border-radius: 8px;
+  background: #000;
+  /* Subtle faded blue border effect */
+  box-shadow: 
+    0 0 0 2px rgba(1, 180, 228, 0.15), /* Inner faint blue line */
+    0 0 15px rgba(1, 180, 228, 0.1);    /* Very subtle blue glow */
+  position: relative;
+}
 
+/* Mute button adjustments for new height */
 #muteBtn {
-  position: absolute;
-  left: 12px;
-  bottom: 12px;
-  z-index: 20; /* above the <video> */
-  padding: 8px 10px;
-  border: 0;
-  border-radius: 10px;
-  background: rgba(0,0,0,0.6);
+  position: relative;
+  bottom: 45px;
+  left: 10px;
+  z-index: 20;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 20px;
+  background: rgba(0, 0, 0, 0.6);
   color: #fff;
   font-weight: 600;
   backdrop-filter: blur(2px);
   cursor: pointer;
-}
-#muteBtn:hover { background: rgba(0,0,0,0.75); }
-#muteBtn:focus { outline: 2px solid #FF4D6D; outline-offset: 2px; }
-
-
-.video-player {
-  width: 100%;
-  max-height: 60vh;
-  border-radius: 12px;
-  background: #000;
-  border: 2px solid rgba(255, 77, 109, 0.2);
-}
-
-@media (max-width: 768px) {
-  .promo-video-container {
-    padding: 18px;
-    margin: 16px;
-  }
-  
-  .video-player-wrapper {
-    flex-direction: column;
-  }
-  
-  .video-player {
-    max-height: 40vh;
-    border-radius: 10px;
-  }
+  transition: all 0.2s ease;
 }
 
 /* Summarize Movie button */
@@ -3058,6 +3047,271 @@ margin-top: -9px;
   }
 }
 
+
+.action-buttons {
+  display: flex;
+  gap: 12px;                /* even spacing */
+  justify-content: center;  /* center horizontally */
+  margin: 0px 0;           /* spacing above and below */
+  flex-wrap: wrap;          /* wrap on small screens instead of pushing down */
+}
+
+.summarize-btn {
+  flex: 1;                  /* equal width for all buttons */
+  max-width: 180px;         /* prevent overly wide buttons */
+  background: #4A90E2;      /* solid blue (Bootstrap blue) */
+  color: #fff;              /* white text */
+  padding: 10px 15px;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.summarize-btn:hover {
+  background: #0056b3;      /* darker blue on hover */
+}
+
+.keep-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.85);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+}
+
+.keep-modal.hidden {
+  display: none;
+}
+
+.keep-content {
+  background: var(--card-bg);
+  padding: 20px;
+  border-radius: 12px;
+  max-width: 90%;
+  max-height: 80%;
+  overflow-y: auto;
+  position: relative;
+  border: 1px solid var(--primary);
+}
+
+.close-btn {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  font-size: 24px;
+  cursor: pointer;
+  color: var(--text-muted);
+}
+
+.close-btn:hover {
+  color: var(--text-light);
+}
+
+/* Styles for the more text link */
+.movie-more-link {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background: rgba(0, 0, 0, 0.7);
+  border-radius: 4px;
+  padding: 4px 8px;
+  cursor: pointer;
+  z-index: 5;
+  transition: all 0.3s ease;
+  color: white;
+  font-size: 12px;
+  font-weight: 600;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.movie-more-link:hover {
+  background: rgba(1, 180, 228, 0.8);
+  transform: scale(1.05);
+}
+
+/* Modal styles */
+.related-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.95);
+  z-index: 2000;
+  display: flex;
+  flex-direction: column;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.related-modal.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+.modal-header {
+  padding: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(3, 37, 65, 0.9);
+  border-bottom: 1px solid rgba(1, 180, 228, 0.3);
+}
+
+.modal-header h2 {
+  margin: 0;
+  color: white;
+  font-size: 1.5rem;
+}
+
+.close-modal {
+  background: transparent;
+  border: none;
+  color: white;
+  font-size: 24px;
+  cursor: pointer;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.3s;
+}
+
+.close-modal:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.modal-content {
+  flex: 1;
+  padding: 20px;
+  overflow-y: auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 20px;
+}
+
+.modal-movie-card {
+  position: relative;
+  border-radius: 8px;
+  overflow: hidden;
+  aspect-ratio: 2/3;
+  background: var(--card-bg);
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+
+.modal-movie-card:hover {
+  transform: scale(1.05);
+}
+
+.modal-movie-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.modal-movie-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 10px;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
+}
+
+.modal-movie-title {
+  color: white;
+  font-size: 14px;
+  font-weight: 600;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.modal-movie-rating {
+  color: #ffd700;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+
+/* Section header with More link */
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.view-all-link {
+  color: var(--primary);
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  transition: color 0.3s;
+}
+
+.view-all-link:hover {
+  color: #00f6ff;
+  text-decoration: underline;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .modal-content {
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 15px;
+    padding: 15px;
+  }
+  
+  .movie-more-link {
+    font-size: 11px;
+    padding: 3px 6px;
+  }
+}
+
+@media (max-width: 480px) {
+  .modal-content {
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    gap: 12px;
+    padding: 10px;
+  }
+  
+  .modal-header {
+    padding: 15px;
+  }
+  
+  .modal-header h2 {
+    font-size: 1.2rem;
+  }
+  
+  .movie-more-link {
+    font-size: 10px;
+    padding: 2px 5px;
+  }
+  
+  .view-all-link {
+    font-size: 12px;
+  }
+}
   </style>
 </head>
 <body>
@@ -3131,17 +3385,13 @@ margin-top: -9px;
 
 <!-- Add this under your carousel-container div -->
 <div class="promo-video-container">
-  <h2 class="section-title">TopTrailers</h2>
+  <h2 class="section-title"></h2>
   <div class="video-player-wrapper">
-    <video id="promoVideoPlayer"  class="video-player"autoplay muted playsinline>
-      Your browser does not support HTML5 video.
-    </video>
-    <!-- Custom Mute/Unmute Button -->
-  <button id="muteBtn" style="position:absolute;bottom:10px;left:10px;z-index:10;">
-    🔇 Mute
-  </button>
-     
-  </div>
+  <video id="promoVideoPlayer" class="video-player" autoplay muted playsinline>
+    Your browser does not support HTML5 video.
+  </video>
+  <button id="muteBtn">🔇 Mute</button>
+</div>
 </div>
     <!-- Movie Sections -->
     <div class="section">
@@ -3206,12 +3456,7 @@ margin-top: -9px;
   <div class="tab-content" id="watchSection">
   <div class="player-container" id="playerContainer">
     <div class="watch-placeholder" id="watchPlaceholder">
-      <div class="error-message">
-        <i class="fas fa-film"></i>
-        <h2>Ready to Watch?</h2>
-        <p>Select a movie from Movies or Mood to start streaming!</p>
-        <button class="retry-btn" onclick="switchTab('movies')">Browse Movies</button>
-      </div>
+      
     </div>
     
     <div class="player-wrapper">
@@ -3230,7 +3475,10 @@ margin-top: -9px;
   <!-- existing notices -->
 </div>
 
-<button id="summarizeMovieBtn" class="summarize-btn">Summarize Movie</button>
+<div class="action-buttons">
+  <button id="summarizeMovieBtn" class="summarize-btn">Summarize</button>
+  <button id="keepForLaterBtn" class="summarize-btn">Keep for Later</button>
+</div>
 
 <!-- Summary Modal -->
 <div id="summaryModal" class="summary-modal hidden">
@@ -3256,18 +3504,7 @@ margin-top: -9px;
       
     <!-- TV Show Season/Episode Selector -->
     <div class="tv-selector" id="tvSelector" style="display: none;">
-      <div class="error-message">
-        <i class="fas fa-tv"></i>
-        <h2>Select Season and Episode</h2>
-        <select id="seasonSelect">
-          <option value="">Choose Season</option>
-        </select>
-        <select id="episodeSelect" disabled>
-          <option value="">Choose Episode</option>
-        </select>
-        <button class="retry-btn" onclick="playSelectedEpisode()">Watch Now</button>
-        <button class="retry-btn" onclick="cancelTvSelection()">Cancel</button>
-      </div>
+      
     </div>
   </div>
   
@@ -3476,12 +3713,12 @@ const playlist = [
   {
     title: "red Sonja",
     src: "https://ia601600.us.archive.org/12/items/red-sonja-official-trailer-hd-720p/Red_Sonja___Official_Trailer_HD%28720p%29.mp4", 
-    type: "video/mp46"
+    type: "video/mp4"
   },
   {
     title: "Doctor Who S1E2 The End of the World",
     src: "https://dn721600.ca.archive.org/0/items/doctor-who-2005-s01/2005%20-%20Series%201/S01E02%20The%20End%20of%20the%20World.mp4",
-    type: "video/mp4"
+    type: "video/mp46"
   },
   
   {
@@ -3655,7 +3892,7 @@ function applyDataSaverMode() {
   initVideoPlayer(); // Initialize the video player
   applyDataSaverMode(); // ensure the class is set on load
 
-  const seasonSelect = document.getElementById('seasonSelect');
+  
   if (seasonSelect) {
     seasonSelect.addEventListener('change', async (e) => {
       const season = e.target.value;
@@ -3942,6 +4179,8 @@ function showInitialPlaceholder() {
   </div>
 `;
   document.getElementById('movieInfoSection').style.display = 'none';
+ 
+ document.querySelector('.action-buttons').style.display = 'none';
   document.getElementById('placeholderContent').classList.add('active'); // Show placeholder content
 }
 
@@ -4032,7 +4271,12 @@ function showInitialPlaceholder() {
       await playMovie(movie.id, card.dataset.type);
       switchTab('watch'); // Switch to watch tab after playing
     });
-    container.appendChild(card);
+    // After creating the cards, add the More text
+  setTimeout(() => {
+    addMoreTextToCards();
+    addViewAllLinks();
+  }, 100);
+ container.appendChild(card);
   });
 }
     // Load carousel
@@ -4314,6 +4558,7 @@ function clearMediaCache() {
     async function playMovie(id, type) {
   console.log(`Playing ${type}: ID ${id}`);
   try {
+  document.querySelector('.action-buttons').style.display = 'flex';
     watchPlaceholder.style.display = 'block';
     watchPlaceholder.innerHTML = `
       <div class="error-message">
@@ -4532,7 +4777,7 @@ function clearMediaCache() {
         <button class="retry-btn" onclick="switchTab('movies')">Browse Movies</button>
       </div>
     `;
-    watchPlaceholder.style.display = 'block';
+   document.querySelector('.action-buttons').style.display = 'none'; watchPlaceholder.style.display = 'block';
     moviePlayer.style.display = 'none';
     document.getElementById('tvControls').style.display = 'none';
     document.getElementById('placeholderContent').style.display = 'block';
@@ -4729,158 +4974,18 @@ async function playFromControls(id, season, episode) {
      
      
 // Play selected TV episode
-async function playSelectedEpisode() {
-  const seasonSelect = document.getElementById('seasonSelect');
-  const episodeSelect = document.getElementById('episodeSelect');
-  const season = seasonSelect.value;
-  const episode = episodeSelect.value;
-  const { id, type, tmdb_id } = currentMovie || {};
-
-  if (!id || type !== 'tv') {
-    console.error('Invalid call to playSelectedEpisode: Not a TV show or no current movie');
-    watchPlaceholder.innerHTML = `
-      <div class="error-message">
-        <i class="fas fa-exclamation-triangle"></i>
-        <h2>Invalid Selection</h2>
-        <p>Please select a TV show from Movies or Mood.</p>
-        <button class="retry-btn" onclick="switchTab('movies')">Browse Movies</button>
-      </div>
-    `;
-    watchPlaceholder.style.display = 'block';
-    document.getElementById('tvSelector').style.display = 'none';
-    document.getElementById('placeholderContent').style.display = 'block';
-    return;
-  }
-
-  if (!tmdb_id) {
-    console.error('No Tmdb ID available for TV show ID:', id);
-    watchPlaceholder.innerHTML = `
-      <div class="error-message">
-        <i class="fas fa-exclamation-triangle"></i>
-        <h2>Missing IMDb ID</h2>
-        <p>Unable to play TV show. Please try another.</p>
-        <button class="retry-btn" onclick="switchTab('movies')">Browse Movies</button>
-      </div>
-    `;
-    watchPlaceholder.style.display = 'block';
-    document.getElementById('tvSelector').style.display = 'none';
-    document.getElementById('placeholderContent').style.display = 'block';
-    return;
-  }
-
-  if (!season || !episode) {
-    console.error('No season or episode selected: Season', season, 'Episode', episode);
-    watchPlaceholder.innerHTML = `
-      <div class="error-message">
-        <i class="fas fa-exclamation-triangle"></i>
-        <h2>Please Select Season and Episode</h2>
-        <p>Choose a season and episode to watch this show.</p>
-        <button class="retry-btn" onclick="document.getElementById('tvSelector').style.display = 'flex'; watchPlaceholder.style.display = 'none';">Try Again</button>
-      </div>
-    `;
-    watchPlaceholder.style.display = 'block';
-    document.getElementById('tvSelector').style.display = 'none';
-    document.getElementById('placeholderContent').style.display = 'block';
-    return;
-  }
-
-  console.log(`Playing TV episode: TMDB ${id}, Season ${season}, Episode ${episode}`);
-  try {
-    watchPlaceholder.style.display = 'block';
-    watchPlaceholder.innerHTML = `
-      <div class="error-message">
-        <i class="fas fa-spinner fa-spin" style="font-size: 2.5rem; color: var(--primary);"></i>
-        <h2>Loading Episode...</h2>
-        <p>Fetching episode details, please wait.</p>
-      </div>
-    `;
-    document.getElementById('tvSelector').style.display = 'none';
-
-  // Use TV episode embed URL with TMDB + proxy (like livecodewith worker.html)
-moviePlayer.src = `${PROXY_URL}?url=${encodeURIComponent(
-  `https://vidsrc.me/embed/tv?tmdb=${contentId}&season=${season}&episode=${episode}`
-)}`;
-console.log(`Setting TV player src: ${moviePlayer.src}`);
-
-    // Fetch episode details for display
-    const [detailsRes, episodeRes] = await Promise.all([
-      fetch(`${BASE_URL}/tv/${id}?api_key=${API_KEY}`),
-      fetch(`${BASE_URL}/tv/${id}/season/${season}/episode/${episode}?api_key=${API_KEY}`)
-    ]);
-    if (!detailsRes.ok || !episodeRes.ok) {
-      console.error(`TV details failed: Status ${detailsRes.status}, Episode failed: Status ${episodeRes.status}`);
-      throw new Error(`Failed to fetch TV data for ID ${id}, Season ${season}, Episode ${episode}`);
-    }
-    const media = await detailsRes.json();
-    const episodeData = await episodeRes.json();
-
-    moviePlayer.style.display = 'block';
-    watchPlaceholder.style.display = 'none';
-    movieTitle.textContent = `${media.name} - S${season}E${episode}: ${episodeData.name || 'Episode'}`;
-    movieRating.innerHTML = `<i class="fas fa-star" style="color:#ffd700;"></i> ${episodeData.vote_average ? episodeData.vote_average.toFixed(1) : media.vote_average ? media.vote_average.toFixed(1) : 'N/A'}/10`;
-    movieYear.textContent = episodeData.air_date ? episodeData.air_date.split('-')[0] : media.first_air_date ? media.first_air_date.split('-')[0] : 'N/A';
-    movieRuntime.textContent = episodeData.runtime ? `${Math.floor(episodeData.runtime / 60)}h ${episodeData.runtime % 60}m` : 'N/A';
-    movieGenres.innerHTML = media.genres.map(genre => `<span class="genre">${genre.name}</span>`).join('');
-    movieOverview.textContent = episodeData.overview || media.overview || 'No overview available.';
-    document.getElementById('movieInfoSection').style.display = 'block';
-    document.getElementById('placeholderContent').style.display = 'none';
-  } catch (error) {
-    console.error(`Error playing TV episode for ID ${id}, Season ${season}, Episode ${episode}:`, error.message);
-    watchPlaceholder.innerHTML = `
-      <div class="error-message">
-        <i class="fas fa-exclamation-triangle"></i>
-        <h2>Oops, Something Went Wrong!</h2>
-        <p>Sorry, we couldn't load the episode. It might not be available.</p>
-        <button class="retry-btn" onclick="switchTab('movies')">Browse Movies</button>
-      </div>
-    `;
-    watchPlaceholder.style.display = 'block';
-    moviePlayer.style.display = 'none';
-    document.getElementById('placeholderContent').style.display = 'block';
+function playSelectedEpisode() {
+  const season = document.getElementById('seasonControlSelect').value;
+  const episode = document.getElementById('episodeControlSelect').value;
+  if (currentMovie && season && episode) {
+    playFromControls(currentMovie.id, season, episode);
   }
 }
 
 // Populate episode dropdown based on selected season
 async function populateEpisodes(id, season) {
-  console.log(`Fetching episodes for TV show ID ${id}, Season ${season}`);
-  const episodeSelect = document.getElementById('episodeSelect');
-  episodeSelect.innerHTML = '<option value="">Choose Episode</option>';
-  episodeSelect.disabled = true;
-
-  // Validate season number
-  if (!id || !season || isNaN(season) || season < 0) {
-    console.error(`Invalid parameters: ID ${id}, Season ${season}`);
-    episodeSelect.innerHTML = '<option value="">Invalid Season</option>';
-    return;
-  }
-
-  try {
-    const response = await fetch(`${BASE_URL}/tv/${id}/season/${season}?api_key=${API_KEY}`);
-    if (!response.ok) {
-      console.error(`Episodes request failed: Status ${response.status}, ID ${id}, Season ${season}`);
-      throw new Error(`Failed to fetch episodes for season ${season} (Status ${response.status})`);
-    }
-    const seasonData = await response.json();
-    console.log(`Season ${season} episodes for ID ${id}:`, seasonData.episodes);
-    if (seasonData.episodes && seasonData.episodes.length > 0) {
-      seasonData.episodes
-        .filter(episode => episode.episode_number > 0) // Exclude invalid episodes
-        .forEach(episode => {
-          const option = document.createElement('option');
-          option.value = episode.episode_number;
-          option.textContent = `Episode ${episode.episode_number}: ${episode.name || 'Untitled'}`;
-          episodeSelect.appendChild(option);
-        });
-      episodeSelect.disabled = seasonData.episodes.length === 0;
-      console.log(`Episode dropdown populated with ${seasonData.episodes.length} episodes for ID ${id}, Season ${season}`);
-    } else {
-      console.error(`No episodes found for ID ${id}, Season ${season}`);
-      episodeSelect.innerHTML = '<option value="">No Episodes Available</option>';
-    }
-  } catch (error) {
-    console.error(`Error fetching episodes for ID ${id}, Season ${season}:`, error.message);
-    episodeSelect.innerHTML = '<option value="">Error Loading Episodes</option>';
-  }
+  // Redirect old calls to the control-based function
+  return populateControlEpisodes(id, season);
 }
 
 
@@ -6069,6 +6174,452 @@ if (document.readyState === 'loading') {
 }
 
 
+document.addEventListener("DOMContentLoaded", () => {
+  // Force the app to use TV Controls as the only selectors
+  const seasonControl = document.getElementById("seasonControlSelect");
+  const episodeControl = document.getElementById("episodeControlSelect");
+
+  // Alias modal selectors to the same DOM elements
+  window.seasonSelect = seasonControl;
+  window.episodeSelect = episodeControl;
+
+  // Wire them up
+  seasonControl.addEventListener("change", () => {
+    const { id } = currentMovie || {};
+    const season = seasonControl.value;
+    if (id && season) {
+      populateEpisodes(id, season);
+    }
+  });
+
+  episodeControl.addEventListener("change", () => {
+    playSelectedEpisode();
+  });
+
+  // Always kill the modal display attempt
+  const modal = document.getElementById("tvSelector");
+  if (modal) {
+    const observer = new MutationObserver(() => {
+      modal.style.display = "none";
+    });
+    observer.observe(modal, { attributes: true, attributeFilter: ["style", "class"] });
+  }
+});
+
+
+function initKeepForLaterButton() {
+  const btn = document.getElementById("keepForLaterBtn");
+  if (!btn) return;
+
+  btn.addEventListener("click", async () => {
+    if (!currentMovie) {
+      alert("No movie loaded.");
+      return;
+    }
+
+    try {
+      const res = await fetch("https://projectbabados.winnerukoh.workers.dev/save", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id: currentMovie.id,
+          title: currentMovie.title || currentMovie.name,
+          poster: currentMovie.poster_path,
+          year: currentMovie.release_date?.split("-")[0] || "N/A"
+        })
+      });
+
+      if (res.ok) {
+  showKeepModal({
+    id: currentMovie.id,
+    title: currentMovie.title || currentMovie.name,
+    poster: currentMovie.poster_path,
+    year: currentMovie.release_date?.split("-")[0] || "N/A"
+  });
+
+      } else {
+        const text = await res.text();
+        alert("Failed to save: " + text);
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Network error while saving.");
+    }
+  });
+}
+
+// Run after DOM is ready
+document.addEventListener("DOMContentLoaded", () => {
+  initKeepForLaterButton();
+});
+
+function showKeepForLater() {
+  const saved = JSON.parse(localStorage.getItem("keepForLaterList")) || [];
+  if (saved.length === 0) {
+    alert("Your Keep for Later list is empty.");
+    return;
+  }
+
+  const modal = document.createElement("div");
+  modal.className = "moments-modal";
+
+  modal.innerHTML = `
+    <h3>Keep for Later</h3>
+    <ul>
+      ${saved.map(m => `
+        <li>
+          <img src="https://image.tmdb.org/t/p/w200${m.poster}" style="width:40px; vertical-align:middle; margin-right:8px;">
+          ${m.title} (${m.year})
+        </li>`).join("")}
+    </ul>
+    <button id="closeKeep">Close</button>
+  `;
+
+  document.body.appendChild(modal);
+  document.getElementById("closeKeep").onclick = () => modal.remove();
+}
+
+function showKeepModal(movie) {
+  // User's movie
+  const userKeep = document.getElementById("userKeep");
+  userKeep.innerHTML = `
+    <img src="https://image.tmdb.org/t/p/w200${movie.poster}" alt="${movie.title}">
+    <p><strong>${movie.title}</strong> (${movie.year})</p>
+  `;
+
+  // Fetch trending keeps
+  fetch("https://projectbabados.winnerukoh.workers.dev/list")
+    .then(res => res.json())
+    .then(movies => {
+      const trending = document.getElementById("trendingKeeps");
+      trending.innerHTML = movies.map(m => `
+        <div style="margin:8px 0;">
+          <img src="https://image.tmdb.org/t/p/w200${m.poster}" style="width:50px; vertical-align:middle; border-radius:4px; margin-right:8px;">
+          <span>${m.title} (${m.year})  🔥 ${m.saves}</span>
+        </div>
+      `).join("");
+    });
+
+  // Show modal
+  document.getElementById("keepModal").classList.remove("hidden");
+
+  // Close modal
+  document.getElementById("closeKeepModal").onclick = () => {
+    document.getElementById("keepModal").classList.add("hidden");
+  };
+}
+
+// Function to add More text to movie cards
+function addMoreTextToCards() {
+  document.querySelectorAll('.movie-card').forEach(card => {
+    // Check if More link already exists to avoid duplicates
+    if (!card.querySelector('.movie-more-link')) {
+      const moreLink = document.createElement('div');
+      moreLink.className = 'movie-more-link';
+      moreLink.innerHTML = `
+        More
+        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" viewBox="0 0 16 16" style="margin-left: 3px;">
+          <path fill-rule="evenodd" d="M4 8a.5.5 0 0 1 .5-.5h5.793L8.146 5.354a.5.5 0 1 1 .708-.708l3 3a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708-.708l2.147-2.146H4.5A.5.5 0 0 1 4 8z"/>
+        </svg>
+      `;
+      
+      // Get movie data from the card
+      const movieId = card.dataset.id;
+      const mediaType = card.dataset.type;
+      const movieTitle = card.querySelector('img') ? card.querySelector('img').alt : 
+                        (card.querySelector('.placeholder-poster') ? card.querySelector('.placeholder-poster').textContent : 'Unknown');
+      
+      // Add click event to open modal with related content
+      moreLink.addEventListener('click', async (e) => {
+        e.stopPropagation(); // Prevent triggering the card's click event
+        await showRelatedModal(movieId, mediaType, movieTitle);
+      });
+      
+      card.appendChild(moreLink);
+    }
+  });
+}
+
+// Function to show modal with related movies
+async function showRelatedModal(movieId, mediaType, movieTitle) {
+  try {
+    // Create modal if it doesn't exist
+    let modal = document.getElementById('relatedModal');
+    if (!modal) {
+      modal = document.createElement('div');
+      modal.id = 'relatedModal';
+      modal.className = 'related-modal';
+      modal.innerHTML = `
+        <div class="modal-header">
+          <h2>Related to ${movieTitle}</h2>
+          <button class="close-modal">&times;</button>
+        </div>
+        <div class="modal-content"></div>
+      `;
+      document.body.appendChild(modal);
+      
+      // Add close event
+      modal.querySelector('.close-modal').addEventListener('click', () => {
+        modal.classList.remove('active');
+      });
+      
+      // Close modal when clicking outside content
+      modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+          modal.classList.remove('active');
+        }
+      });
+      
+      // Close modal with Escape key
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && modal.classList.contains('active')) {
+          modal.classList.remove('active');
+        }
+      });
+    } else {
+      // Update modal title if it already exists
+      modal.querySelector('h2').textContent = `Related to ${movieTitle}`;
+    }
+    
+    // Show loading state
+    const modalContent = modal.querySelector('.modal-content');
+    modalContent.innerHTML = `
+      <div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: #aaa;">
+        <i class="fas fa-spinner fa-spin" style="font-size: 2rem;"></i>
+        <p>Loading related content...</p>
+      </div>
+    `;
+    
+    // Show modal
+    modal.classList.add('active');
+    
+    // Fetch related content
+    let endpoint = '';
+    if (mediaType === 'movie') {
+      endpoint = `/movie/${movieId}/recommendations`;
+    } else {
+      endpoint = `/tv/${movieId}/recommendations`;
+    }
+    
+    const related = await fetchMovies(endpoint);
+    
+    // Display related content
+    if (related && related.length > 0) {
+      modalContent.innerHTML = '';
+      
+      related.forEach(item => {
+        const card = document.createElement('div');
+        card.className = 'modal-movie-card';
+        card.dataset.id = item.id;
+        card.dataset.type = item.media_type || mediaType;
+        
+        const dataSaverEnabled = localStorage.getItem('dataSaver') === 'true';
+        
+        card.innerHTML = `
+          ${dataSaverEnabled || !item.poster_path ? 
+            `<div class="placeholder-poster">${item.title || item.name}</div>` :
+            `<img src="${IMG_URL}${item.poster_path}" alt="${item.title || item.name}" loading="lazy" />`
+          }
+          <div class="modal-movie-overlay">
+            <p class="modal-movie-title">${item.title || item.name}</p>
+            <div class="modal-movie-rating">
+              <i class="fas fa-star"></i>
+              ${item.vote_average ? item.vote_average.toFixed(1) : 'N/A'}
+            </div>
+          </div>
+        `;
+        
+        // Add click event to play the movie
+        card.addEventListener('click', () => {
+          playMovie(item.id, item.media_type || mediaType);
+          switchTab('watch');
+          modal.classList.remove('active');
+        });
+        
+        modalContent.appendChild(card);
+      });
+    } else {
+      modalContent.innerHTML = `
+        <div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: #aaa;">
+          <i class="fas fa-film" style="font-size: 2rem;"></i>
+          <p>No related content available</p>
+        </div>
+      `;
+    }
+  } catch (error) {
+    console.error('Error loading related content:', error);
+    const modalContent = document.querySelector('#relatedModal .modal-content');
+    if (modalContent) {
+      modalContent.innerHTML = `
+        <div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: #aaa;">
+          <i class="fas fa-exclamation-triangle" style="font-size: 2rem;"></i>
+          <p>Error loading related content</p>
+          <button onclick="showRelatedModal('${movieId}', '${mediaType}', '${movieTitle}')" 
+                  style="margin-top: 10px; padding: 8px 16px; background: var(--primary); border: none; border-radius: 4px; color: white; cursor: pointer;">
+            Try Again
+          </button>
+        </div>
+      `;
+    }
+  }
+}
+
+// Add View All links to section headers
+function addViewAllLinks() {
+  const sections = document.querySelectorAll('.section');
+  
+  sections.forEach(section => {
+    const heading = section.querySelector('h2');
+    if (heading && !section.querySelector('.view-all-link')) {
+      // Create a container for header
+      const headerContainer = document.createElement('div');
+      headerContainer.className = 'section-header';
+      
+      // Move the heading into the container
+      heading.parentNode.insertBefore(headerContainer, heading);
+      headerContainer.appendChild(heading);
+      
+      // Add View All link
+      const viewAllLink = document.createElement('a');
+      viewAllLink.className = 'view-all-link';
+      viewAllLink.href = '#';
+      viewAllLink.innerHTML = `
+        View All
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16">
+          <path fill-rule="evenodd" d="M4 8a.5.5 0 0 1 .5-.5h5.793L8.146 5.354a.5.5 0 1 1 .708-.708l3 3a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708-.708l2.147-2.146H4.5A.5.5 0 0 1 4 8z"/>
+        </svg>
+      `;
+      
+      // Get the grid from this section
+      const grid = section.querySelector('.static-carousel');
+      if (grid) {
+        // Add click event to show all movies in this section
+        viewAllLink.addEventListener('click', (e) => {
+          e.preventDefault();
+          const movies = [];
+          grid.querySelectorAll('.movie-card').forEach(card => {
+            movies.push({
+              id: card.dataset.id,
+              media_type: card.dataset.type,
+              title: card.querySelector('img') ? card.querySelector('img').alt : 
+                     (card.querySelector('.placeholder-poster') ? card.querySelector('.placeholder-poster').textContent : 'Unknown'),
+              poster_path: card.querySelector('img') ? card.querySelector('img').src.replace(IMG_URL, '') : null,
+              vote_average: card.querySelector('.movie-rating') ? 
+                            parseFloat(card.querySelector('.movie-rating').textContent.replace('N/A', '0')) : 0
+            });
+          });
+          
+          showSectionModal(heading.textContent, movies);
+        });
+      }
+      
+      headerContainer.appendChild(viewAllLink);
+    }
+  });
+}
+
+// Function to show all movies in a section
+function showSectionModal(sectionTitle, movies) {
+  // Create modal if it doesn't exist
+  let modal = document.getElementById('sectionModal');
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.id = 'sectionModal';
+    modal.className = 'related-modal';
+    modal.innerHTML = `
+      <div class="modal-header">
+        <h2>${sectionTitle}</h2>
+        <button class="close-modal">&times;</button>
+      </div>
+      <div class="modal-content"></div>
+    `;
+    document.body.appendChild(modal);
+    
+    // Add close event
+    modal.querySelector('.close-modal').addEventListener('click', () => {
+      modal.classList.remove('active');
+    });
+    
+    // Close modal when clicking outside content
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) {
+        modal.classList.remove('active');
+      }
+    });
+  } else {
+    // Update modal title if it already exists
+    modal.querySelector('h2').textContent = sectionTitle;
+  }
+  
+  // Show content
+  const modalContent = modal.querySelector('.modal-content');
+  modalContent.innerHTML = '';
+  
+  if (movies && movies.length > 0) {
+    movies.forEach(item => {
+      const card = document.createElement('div');
+      card.className = 'modal-movie-card';
+      card.dataset.id = item.id;
+      card.dataset.type = item.media_type || 'movie';
+      
+      const dataSaverEnabled = localStorage.getItem('dataSaver') === 'true';
+      
+      card.innerHTML = `
+        ${dataSaverEnabled || !item.poster_path ? 
+          `<div class="placeholder-poster">${item.title}</div>` :
+          `<img src="${IMG_URL}${item.poster_path}" alt="${item.title}" loading="lazy" />`
+        }
+        <div class="modal-movie-overlay">
+          <p class="modal-movie-title">${item.title}</p>
+          <div class="modal-movie-rating">
+            <i class="fas fa-star"></i>
+            ${item.vote_average ? item.vote_average.toFixed(1) : 'N/A'}
+          </div>
+        </div>
+      `;
+      
+      // Add click event to play the movie
+      card.addEventListener('click', () => {
+        playMovie(item.id, item.media_type || 'movie');
+        switchTab('watch');
+        modal.classList.remove('active');
+      });
+      
+      modalContent.appendChild(card);
+    });
+  }
+  
+  // Show modal
+  modal.classList.add('active');
+}
+
+ // Also call after any dynamic content loads
+  const observer = new MutationObserver(function(mutations) {
+    mutations.forEach(function(mutation) {
+      if (mutation.addedNodes.length) {
+        setTimeout(() => {
+          addMoreTextToCards();
+          addViewAllLinks();
+        }, 300);
+      }
+    });
+  });
+  
+  observer.observe(document.body, {
+    childList: true,
+    subtree: true
+  });
+
 </script>
+<div id="keepModal" class="keep-modal hidden">
+  <div class="keep-content">
+    <span id="closeKeepModal" class="close-btn">&times;</span>
+    <h3>You kept this for later</h3>
+    <div id="userKeep"></div>
+    <hr>
+    <h4>🔥 What others are keeping</h4>
+    <div id="trendingKeeps"></div>
+  </div>
+</div>
 </body>
 </html>
