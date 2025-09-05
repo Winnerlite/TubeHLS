@@ -3312,6 +3312,165 @@ margin-top: -9px;
     font-size: 12px;
   }
 }
+
+/* Keep for later icon*/
+.icon-btn {
+  position: relative;
+  background: none;
+  border: none;
+  cursor: pointer;
+  margin-left: 5px;
+  color: #fff; /* match theme */
+}
+
+.icon-btn svg {
+  width: 0px; /*change to 20 later*/
+  height: 24px;
+}
+
+.count-badge {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  background: #e11d48; /* red badge */
+  color: #fff;
+  font-size: 12px;
+  font-weight: bold;
+  padding: 2px 6px;
+  border-radius: 50%;
+}
+
+.keeps-modal {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: #0a0a0a;
+  color: #fff;
+  overflow-y: auto;
+  z-index: 2000;
+  padding: 20px;
+}
+
+.keeps-modal.hidden {
+  display: none;
+}
+
+.keeps-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.keeps-header h2 {
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 22px;
+  cursor: pointer;
+}
+
+.keeps-featured {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.keeps-featured img {
+  width: 100%;
+  max-height: 300px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.keeps-featured h3 {
+  margin-top: 10px;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.keeps-list {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+.keeps-card {
+  background: #1a1a1a;
+  border-radius: 8px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.keeps-card:hover {
+  transform: scale(1.03);
+}
+
+.keeps-card img {
+  width: 100%;
+  height: 150px;
+  object-fit: cover;
+}
+
+.keeps-card p {
+  margin: 6px;
+  font-size: 14px;
+  text-align: center;
+}
+
+.comment-box {
+  margin: 15px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.comment-box input,
+.comment-box textarea {
+  padding: 10px;
+  border: none;
+  border-radius: 6px;
+  background: #1a1a1a;
+  color: #fff;
+}
+
+.comment-box button {
+  align-self: flex-end;
+  background: #2563eb; /* nice blue */
+  color: #fff;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.comment-box button:hover {
+  background: #1d4ed8;
+}
+
+.comments-list {
+  margin-top: 10px;
+}
+
+.comments-list p {
+  background: #111;
+  padding: 8px;
+  border-radius: 6px;
+  margin-bottom: 8px;
+  font-size: 14px;
+}
+
+.comments-list small {
+  display: block;
+  color: #888;
+  font-size: 12px;
+  margin-top: 4px;
+}
   </style>
 </head>
 <body>
@@ -3336,6 +3495,17 @@ margin-top: -9px;
   <!-- Header & Search -->
   <header>
   <div class="search-container" style="display: flex; align-items: center; gap: 10px;">
+       <!-- Watch Later Button -->
+<button id="keepNavBtn" class="icon-btn">
+  <!-- SVG (Bookmark style) -->
+  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+       stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+    <path stroke-linecap="round" stroke-linejoin="round"
+          d="M5.25 5.25v13.5L12 15l6.75 3.75V5.25A2.25 2.25 0 0016.5 3h-9a2.25 2.25 0 00-2.25 2.25z"/>
+  </svg>
+  <!-- Count Badge -->
+  <span id="keepCount" class="count-badge">0</span>
+</button>
     <input type="text" placeholder="Movies and TV shows..." class="search-bar" id="searchInput" />
    <button id="openSettingsBtn" class="settings-btn" aria-label="Settings">
   <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" width="20" height="20" viewBox="0 0 24 24">
@@ -3876,6 +4046,7 @@ new MutationObserver(initResponsiveLayout).observe(document.body, {
 function applyDataSaverMode() {
   const enabled = localStorage.getItem('dataSaver') === 'true';
   document.body.classList.toggle('data-saver', enabled);
+  toggleVideoPlayer();
 }
 
     // Initialize the app
@@ -4783,7 +4954,6 @@ function clearMediaCache() {
     document.getElementById('placeholderContent').style.display = 'block';
   }
 }
-
 
 // Populate episodes in the control dropdown
 async function populateControlEpisodes(id, season) {
@@ -5971,7 +6141,7 @@ function showAiSuggestionModal() {
     </div>
 
     <div class="setting-row data-saver-setting">
-  <span>Save Data (No Images)</span>
+  <span>Save Data (No Images/trailer video)</span>
 
   <div class="switch-wrap">
     <label class="switch">
@@ -6466,7 +6636,7 @@ async function showRelatedModal(movieId, mediaType, movieTitle) {
 
 // Add View All links to section headers
 function addViewAllLinks() {
-  const sections = document.querySelectorAll('.section');
+  const sections = document.querySelectorAll('.section:not(#genreSection):not(#placeholderContent .section)');
   
   sections.forEach(section => {
     const heading = section.querySelector('h2');
@@ -6479,7 +6649,7 @@ function addViewAllLinks() {
       heading.parentNode.insertBefore(headerContainer, heading);
       headerContainer.appendChild(heading);
       
-      // Add View All link
+      // Add View All link (only to sections we want)
       const viewAllLink = document.createElement('a');
       viewAllLink.className = 'view-all-link';
       viewAllLink.href = '#';
@@ -6610,6 +6780,153 @@ function showSectionModal(sectionTitle, movies) {
     subtree: true
   });
 
+// Function to control video player based on Data Saver setting
+function toggleVideoPlayer() {
+  const videoPlayer = document.getElementById('promoVideoPlayer');
+  const promoContainer = document.querySelector('.promo-video-container');
+  const dataSaverEnabled = localStorage.getItem('dataSaver') === 'true';
+  
+  if (videoPlayer && promoContainer) {
+    if (dataSaverEnabled) {
+      // Pause video and hide container
+      videoPlayer.pause();
+      promoContainer.style.display = 'none';
+    } else {
+      // Show container and try to play video
+      promoContainer.style.display = 'block';
+      
+      // Try to play video (with error handling)
+      const playPromise = videoPlayer.play();
+      if (playPromise !== undefined) {
+        playPromise.catch(error => {
+          console.log('Video autoplay prevented:', error);
+          // Video will still be visible but not playing
+        });
+      }
+    }
+  }
+}
+
+// Call this function when Data Saver setting changes
+document.getElementById('toggleDataSaver').addEventListener('change', function(e) {
+  localStorage.setItem('dataSaver', e.target.checked);
+  applyDataSaverMode(); // Your existing function
+  toggleVideoPlayer(); // Control video player
+});
+
+// Also call when page loads
+document.addEventListener('DOMContentLoaded', function() {
+  // Initialize video player state based on Data Saver setting
+  setTimeout(toggleVideoPlayer, 500);
+});
+
+async function updateKeepCount() {
+  try {
+    const res = await fetch("https://projectbabados.winnerukoh.workers.dev/list");
+    const data = await res.json();
+
+    // Sum all saves
+    const totalKeeps = data.reduce((sum, m) => sum + (m.saves || 0), 0);
+
+    document.getElementById("keepCount").textContent = totalKeeps;
+  } catch (err) {
+    console.error("Error fetching keep count:", err);
+  }
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  updateKeepCount();
+
+  // Auto refresh every 10s
+  setInterval(updateKeepCount, 10000);
+});
+
+function initKeepsModal() {
+  const btn = document.getElementById("keepNavBtn");
+  const modal = document.getElementById("keepsModal");
+  const closeBtn = document.getElementById("closeKeepsModal");
+
+  if (!btn || !modal) return;
+
+  btn.addEventListener("click", async () => {
+    modal.classList.remove("hidden");
+
+    try {
+      const res = await fetch("https://projectbabados.winnerukoh.workers.dev/list");
+      const movies = await res.json();
+
+      if (!movies.length) {
+        document.getElementById("keepsFeatured").innerHTML =
+          "<p>No keeps yet. Be the first!</p>";
+        document.getElementById("keepsList").innerHTML = "";
+        return;
+      }
+
+      // Featured = first (highest saves)
+      const featured = movies[0];
+      document.getElementById("keepsFeatured").innerHTML = `
+        <img src="https://image.tmdb.org/t/p/w500${featured.poster}" alt="${featured.title}">
+        <h3>${featured.title} (${featured.year}) — 🔥 ${featured.saves}</h3>
+      `;
+
+      // Rest of list
+      const list = document.getElementById("keepsList");
+      list.innerHTML = movies
+        .map(m => `
+          <div class="keeps-card" onclick="openWatchPage(${m.movie_id})">
+            <img src="https://image.tmdb.org/t/p/w300${m.poster}" alt="${m.title}">
+            <p>${m.title} (${m.year})</p>
+            <p style="color:#0ff;">🔥 ${m.saves}</p>
+          </div>
+        `).join("");
+    } catch (err) {
+      console.error("Error loading keeps:", err);
+    }
+  });
+
+  closeBtn.addEventListener("click", () => {
+    modal.classList.add("hidden");
+  });
+}
+
+// Run after DOM load
+document.addEventListener("DOMContentLoaded", initKeepsModal);
+
+async function postComment() {
+  const username = document.getElementById("usernameInput").value.trim() || "Anon";
+  const text = document.getElementById("commentInput").value.trim();
+
+  if (!text) return;
+
+  await fetch("https://projectbabados.winnerukoh.workers.dev/comment", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      movie_id: "keeps-feed", // since this is the global keeps modal
+      username,
+      text
+    })
+  });
+
+  document.getElementById("commentInput").value = "";
+  loadComments();
+}
+
+async function loadComments() {
+  const res = await fetch("https://projectbabados.winnerukoh.workers.dev/comments?movie_id=keeps-feed");
+  const comments = await res.json();
+
+  document.getElementById("commentsList").innerHTML = comments
+    .map(c => `
+      <p>
+        <strong>${c.username}:</strong> ${c.text}
+        <small>${new Date(c.timestamp).toLocaleString()}</small>
+      </p>
+    `).join("");
+}
+
+// Auto-load comments when modal opens
+document.getElementById("keepNavBtn").addEventListener("click", loadComments);
 </script>
 <div id="keepModal" class="keep-modal hidden">
   <div class="keep-content">
@@ -6621,5 +6938,33 @@ function showSectionModal(sectionTitle, movies) {
     <div id="trendingKeeps"></div>
   </div>
 </div>
+
+<!-- Keeps Modal -->
+<div id="keepsModal" class="keeps-modal hidden">
+  <div class="keeps-header">
+    <h2>🔥 Top Keeps This Week</h2>
+    <button id="closeKeepsModal" class="close-btn">✖</button>
+  </div>
+  
+  <div id="keepsFeatured" class="keeps-featured"></div>
+  <div id="keepsList" class="keeps-list"></div>
+
+  <!-- 💬 Comments Section -->
+  <div id="keepsCommentsSection">
+    <h3>Community Comments</h3>
+
+    <!-- Comments will show here -->
+    <div id="commentsList" class="comments-list"></div>
+
+    <!-- Input at the bottom -->
+    <div class="comment-box">
+      <input id="usernameInput" type="text" placeholder="Your name (optional)">
+      <textarea id="commentInput" placeholder="Write your comment..."></textarea>
+      <button onclick="postComment()">Post</button>
+    </div>
+  </div>
+</div>
+
+
 </body>
 </html>
